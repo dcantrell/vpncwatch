@@ -1,0 +1,63 @@
+vpncwatch is a keepalive daemon for vpnc(8) on Linux systems.
+It is a rewrite of vpnc-watch.py by Greg Benson <gbenson@redhat.com>
+vpncwatch is written by David Cantrell <dcantrell@redhat.com>
+
+IDEA
+
+    The original vpnc-watch.py is included with this source distribution.  If
+    you want your keepalive daemon running in Python, here's your chance.  The
+    main motivation for rewriting it in C is so it can be compiled for mipsel
+    and put on a very limited storage space OpenWRT system.
+
+    The idea behind the program is simple.  Wrap execution of vpnc and handle
+    it receiving SIGHUP and SIGKILL.  SIGHUP will cause a restart, which is
+    handy for an external network checking script.  If you find you cannot hit
+    any VPN-connected hosts, you can send SIGHUP to vpncwatch and it'll
+    restart vpnc.  vpncwatch can do the network checking for you with the
+    right options.  See the -? screen for more information.
+
+LICENSE
+
+    GPL 2.0 or later.  Enjoy.
+
+BUILD
+
+    Check the Makefile and modify for your needs.  Then run 'make'.
+
+INSTALL
+
+    All you need is the vpncwatch binary, and you can copy that to any
+    location.  There is no 'make install'.
+
+USAGE
+
+    Run 'vpncwatch -?' for examples.  It's really very simple.
+
+EXAMPLE
+
+    For the impatient, let's say you run this vpnc command typically:
+
+        /usr/sbin/vpnc /etc/vpnc/vpnc.conf
+
+    With vpncwatch, your new command is:
+
+        vpncwatch /usr/sbin/vpnc /etc/vpnc/vpnc.conf
+
+    If you want to enable VPN network testing, you need to pass a hostname
+    (or IP address) of a host on the VPN as well as a valid TCP port that
+    would be open on that host.  For example:
+
+        vpncwatch \
+            -c intranet.corp.redhat.com -p 80 \
+            /usr/sbin/vpnc /etc/vpnc/vpnc.conf
+
+    You can modify the interval that the host checking occurs with the -i
+    option.  All the host checking does is make sure a running vpnc process
+    is still actually offering an open link.  If vpncwatch can open a socket
+    to that host and it not fail, vpncwatch assumes the link is still open.
+
+    Easy.  If you pass options to vpnc usually, vpncwatch can do that
+    too.  See the -? screen for more information.
+
+-- 
+David Cantrell <dcantrell@redhat.com>

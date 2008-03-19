@@ -1,0 +1,4 @@
+Package: vpncwatch
+Priority: optional
+Section: net
+Description: vpnc(8) keepalive daemon

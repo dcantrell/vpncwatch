@@ -1,0 +1,10 @@
+To build vpncwatch for OpenWRT, download the OpenWRT SDK and extract
+it somewhere.  Copy the package/vpncwatch subdirectory here to the
+package/ subdirectory in the extract SDK tree.
+
+From the top level of the SDK, you can run:
+
+    make clean
+    make world
+
+The built .ipk file will be in the bin/packages subdirectory.

@@ -1,0 +1,15 @@
+config BR2_PACKAGE_VPNCWATCH
+	tristate "vpncwatch - vpnc(8) keepalive daemon"
+	default m if CONFIG_DEVEL
+	help
+	  The vpncwatch daemon is used to keep vpnc(8) constantly
+	  running.  It does two main things.  The first is to watch
+	  and make sure the process is running.  If you kill vpnc,
+	  vpncwatch will notice and will start it up again.  The
+	  second main thing it does is test the VPN connection and
+	  restarts vpnc if necessary.
+	  
+	  vpncwatch is a rewrite of vpnc-watch.py
+	  vpncwatch is written by David Cantrell <dcantrell@redhat.com>
+	  vpnc-watch.py is written by Greg Benson <gbenson@redhat.com>
+	  
