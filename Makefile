@@ -21,7 +21,8 @@ vpncwatch: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 ChangeLog:
-	svn log -v > ChangeLog
+	svn up
+	svn log -v | fold -s > ChangeLog
 
 install:
 	@echo "No."
