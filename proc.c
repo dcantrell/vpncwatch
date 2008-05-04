@@ -146,6 +146,7 @@ syslog(LOG_ERR, "|%s|", de->d_name);
 
         if ((strstr(realproc, realcmd) != NULL) &&
             (strstr(realproc, realwatch) == NULL)) {
+            errno = 0;
             ret = strtol(de->d_name, &ep, 10);
 
             if (((ret == LONG_MIN || ret == LONG_MAX) && (errno == ERANGE)) ||
