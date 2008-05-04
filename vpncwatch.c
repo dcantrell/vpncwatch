@@ -109,25 +109,47 @@ int main(int argc, char **argv) {
                 chkhost = strdup(optarg);
                 break;
             case 'p':
-                if (atoi(optarg) <= 0 || atoi(optarg) >= 65536) {
-                    fprintf(stderr, "Error: Invalid port specified: %d\n",
-                            atoi(optarg));
+                chkport = strtol(optarg, &ep, 10);
+
+                if (((chkport == LONG_MIN || chkport == LONG_MAX) &&
+                     (errno == ERANGE)) ||
+                    ((chkport == 0) && (errno == EINVAL))) {
+                    fprintf(stderr, "%s (%d): %s", __func__, __LINE__,
+                            strerror(errno));
                     fflush(stderr);
                     show_usage(argv[0]);
                     return EXIT_FAILURE;
                 }
 
-                chkport = atoi(optarg);
+                if ((chkport <= 0) || (chkport >= 65536)) {
+                    fprintf(stderr, "Error: Invalid port specified: %d\n",
+                            chkport);
+                    fflush(stderr);
+                    show_usage(argv[0]);
+                    return EXIT_FAILURE;
+                }
+
                 break;
             case 'i':
-                if (atoi(optarg) < 0) {
+                chkinterval = strtol(optarg, &ep, 10);
+
+                if (((chkinterval == LONG_MIN || chkinterval == LONG_MAX) &&
+                     (errno == ERANGE)) ||
+                    ((chkinterval == 0) && (errno == EINVAL))) {
+                    fprintf(stderr, "%s (%d): %s", __func__, __LINE__,
+                            strerror(errno));
+                    fflush(stderr);
+                    show_usage(argv[0]);
+                    return EXIT_FAILURE;
+                }
+
+                if (chkinterval < 0) {
                     fprintf(stderr, "Error: Time interval must be >0\n");
                     fflush(stderr);
                     show_usage(argv[0]);
                     return EXIT_FAILURE;
                 }
 
-                chkinterval = atoi(optarg);
                 break;
             case '?':
                 show_usage(argv[0]);

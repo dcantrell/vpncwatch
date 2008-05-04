@@ -90,6 +90,7 @@ pid_t pidof(char *cmd) {
     char cmdbuf[PATH_MAX];
     char procbuf[PATH_MAX];
     char watchbuf[PATH_MAX];
+    char *ep = NULL;
     DIR *dp = NULL;
     struct dirent *de = NULL;
 
@@ -122,7 +123,7 @@ syslog(LOG_ERR, "%s realwatch: |%s|", __func__, realwatch);
     while ((de = readdir(dp)) != NULL) {
         /* normally, we'd check d_type to see if it's DT_DIR before doing
          * stuff, but uClibc does not set d_type, so we just go anyway if
-         * we can perform an atoi() and get something larger than 0.
+         * we can perform an strtol() and get something larger than 0.
          */
         if (!strcmp(de->d_name, ".") || !strcmp(de->d_name(".."))) {
             continue;
@@ -145,7 +146,14 @@ syslog(LOG_ERR, "|%s|", de->d_name);
 
         if ((strstr(realproc, realcmd) != NULL) &&
             (strstr(realproc, realwatch) == NULL)) {
-            ret = atoi(de->d_name);
+            ret = strtol(de->d_name, &ep, 10);
+
+            if (((ret == LONG_MIN || ret == LONG_MAX) && (errno == ERANGE)) ||
+                ((ret == 0) && (errno == EINVAL))) {
+               syslog(LOG_ERR, "unable to convert %s to int", de->d_name);
+               break;
+            }
+
             syslog(LOG_ERR, "found process %s (%d)", de->d_name, ret);
             break;
         }
