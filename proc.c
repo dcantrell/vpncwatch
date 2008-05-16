@@ -125,7 +125,7 @@ syslog(LOG_ERR, "%s realwatch: |%s|", __func__, realwatch);
          * stuff, but uClibc does not set d_type, so we just go anyway if
          * we can perform an strtol() and get something larger than 0.
          */
-        if (!strcmp(de->d_name, ".") || !strcmp(de->d_name(".."))) {
+        if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) {
             continue;
         }
 
