@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
                 break;
             case 'p':
                 errno = 0;
-                chkport = strtol(optarg, &ep, 10);
+                chkport = strtol(optarg, NULL, 10);
 
                 if (((chkport == LONG_MIN || chkport == LONG_MAX) &&
                      (errno == ERANGE)) ||
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
                 break;
             case 'i':
                 errno = 0;
-                chkinterval = strtol(optarg, &ep, 10);
+                chkinterval = strtol(optarg, NULL, 10);
 
                 if (((chkinterval == LONG_MIN || chkinterval == LONG_MAX) &&
                      (errno == ERANGE)) ||

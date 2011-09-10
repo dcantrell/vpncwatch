@@ -30,6 +30,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "vpncwatch.h"
 
@@ -85,7 +87,7 @@ char *which(char *cmd) {
 /* Return PID of specified command.  This function assumes that only one  */
 /* process is running by that name.                                       */
 pid_t pidof(char *cmd) {
-    pid_t ret = -1;
+    pid_t ret = 0;
     char *realcmd = NULL, *realproc = NULL, *realwatch = NULL, *procpath = NULL;
     char cmdbuf[PATH_MAX];
     char procbuf[PATH_MAX];
