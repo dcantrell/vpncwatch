@@ -53,7 +53,7 @@ int is_network_up(char *chkhost, unsigned short chkport) {
     /* get the server address */
     if (inet_pton(AF_INET, chkhost, &(chksock.sin_addr.s_addr)) <= 0) {
         if ((host = gethostbyname(chkhost)) == NULL) {
-            syslog(LOG_ERR, hstrerror(h_errno));
+            syslog(LOG_ERR, "%s", hstrerror(h_errno));
             return 0;
         }
 
