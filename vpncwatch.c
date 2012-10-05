@@ -90,7 +90,8 @@ void signal_handler(int sig) {
 
 int main(int argc, char **argv) {
     int c, running;
-    char *me = NULL, *cmd = NULL, *cmdpath = NULL;
+    char *me = basename(argv[0]);
+    char *cmd = NULL, *cmdpath = NULL;
     char cmdbuf[PATH_MAX];
     pid_t cmdpid = 0;
     char *chkhost = NULL;
@@ -165,12 +166,18 @@ int main(int argc, char **argv) {
         }
     }
 
-    /* set up control variables */
-    me = basename(argv[0]);
-    cmd = basename(argv[1]);
-    argv[1] = strdup(cmd);
-    argv += optind;                 /* skip to the end.... */
+    /* grab the vpnc command and arguments */
+    if (optind >= argc) {
+        fprintf(stderr, "%s: no vpnc command specified\n", me);
+        return EXIT_FAILURE;
+    } else {
+        cmd = argv[optind];
+    }
 
+    /* want argv to point at the vpnc args from here on */
+    argv += optind + 1;
+
+    /* find the vpnc command */
     if ((cmdpath = realpath(which(cmd), cmdbuf)) == NULL) {
         syslog(LOG_ERR, "realpath failure: %s:%d", __func__, __LINE__);
         return EXIT_FAILURE;
