@@ -48,7 +48,7 @@ EXAMPLE
     would be open on that host.  For example:
 
         vpncwatch \
-            -c intranet.corp.redhat.com -p 80 \
+            -c vpn-only-host.example.net -p 80 \
             /usr/sbin/vpnc /etc/vpnc/vpnc.conf
 
     You can modify the interval that the host checking occurs with the -i
