@@ -1,0 +1,2 @@
+- vpncwatch fails to work correctly on uclibc systems.  Works fine on
+  glibc systems.  Need to debug this and get it working correctly.
