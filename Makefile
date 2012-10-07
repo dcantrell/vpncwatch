@@ -13,7 +13,7 @@ CC     ?= gcc
 CFLAGS = -D_GNU_SOURCE -O2 -Wall -Werror
 
 # Update version in vpncwatch.h as well
-TAG    = vpncwatch-1.8
+TAG    = vpncwatch-1.8.1
 
 vpncwatch: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
