@@ -1,7 +1,7 @@
 /*
  * vpncwatch.c
  * Keepalive daemon for vpnc (so I can fit it on an OpenWRT system)
- * Author: David Cantrell <dcantrell@redhat.com>
+ * Author: David Cantrell <david.l.cantrell@gmail.com>
  *
  * Adapted from vpnc-watch.py by Gary Benson <gbenson@redhat.com>
  * (Python is TOO BIG for a 16M OpenWRT router.)

@@ -10,6 +10,6 @@ config BR2_PACKAGE_VPNCWATCH
 	  restarts vpnc if necessary.
 	  
 	  vpncwatch is a rewrite of vpnc-watch.py
-	  vpncwatch is written by David Cantrell <dcantrell@redhat.com>
+	  vpncwatch is written by David Cantrell <david.l.cantrell@gmail.com>
 	  vpnc-watch.py is written by Greg Benson <gbenson@redhat.com>
 	  

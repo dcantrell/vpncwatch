@@ -1,6 +1,6 @@
 vpncwatch is a keepalive daemon for vpnc(8) on Linux systems.
 It is a rewrite of vpnc-watch.py by Greg Benson <gbenson@redhat.com>
-vpncwatch is written by David Cantrell <dcantrell@redhat.com>
+vpncwatch is written by David Cantrell <david.l.cantrell@gmail.com>
 
 IDEA
 
@@ -60,4 +60,4 @@ EXAMPLE
     too.  See the -? screen for more information.
 
 -- 
-David Cantrell <dcantrell@redhat.com>
+David Cantrell <david.l.cantrell@gmail.com>

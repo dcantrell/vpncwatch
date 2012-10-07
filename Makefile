@@ -1,6 +1,6 @@
 #
 # Makefile for vpncwatch
-# David Cantrell <dcantrell@redhat.com>
+# David Cantrell <david.l.cantrell@gmail.com>
 #
 
 SRCS = vpncwatch.c proc.c net.c
