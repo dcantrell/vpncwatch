@@ -101,21 +101,15 @@ pid_t pidof(char *cmd) {
         return -1;
     }
 
-syslog(LOG_ERR, "%s cmd: |%s|", __func__, cmd);
-
     if ((realcmd = realpath(which(cmd), cmdbuf)) == NULL) {
         syslog(LOG_ERR, "realpath failure: %s:%d", __func__, __LINE__);
         return -1;
     }
 
-syslog(LOG_ERR, "%s realcmd: |%s|", __func__, realcmd);
-
     if ((realwatch = realpath(which("vpncwatch"), watchbuf)) == NULL) {
         syslog(LOG_ERR, "realpath failure: %s:%d", __func__, __LINE__);
         return -1;
     }
-
-syslog(LOG_ERR, "%s realwatch: |%s|", __func__, realwatch);
 
     if ((dp = opendir("/proc")) == NULL) {
         syslog(LOG_ERR, "opendir failure: %s:%d", __func__, __LINE__);
@@ -131,7 +125,6 @@ syslog(LOG_ERR, "%s realwatch: |%s|", __func__, realwatch);
             continue;
         }
 
-syslog(LOG_ERR, "|%s|", de->d_name);
         if (procpath != NULL) {
             free(procpath);
         }
