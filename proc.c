@@ -32,6 +32,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <errno.h>
+#include <assert.h>
 
 #include "vpncwatch.h"
 
@@ -39,10 +40,7 @@
 char *which(char *cmd) {
     char *dir = NULL, *path = NULL, *ret = NULL;
 
-    if (cmd == NULL) {
-        syslog(LOG_ERR, "input to which() is NULL");
-        return NULL;
-    }
+    assert(cmd != NULL);
 
     /* did the user specify the full path to cmd by chance? */
     if (access(cmd, X_OK) == 0) {
@@ -70,7 +68,7 @@ char *which(char *cmd) {
 
         if (asprintf(&ret, "%s/%s", dir, cmd) == -1) {
             syslog(LOG_ERR, "memory allocation: %s:%d", __func__, __LINE__);
-            return NULL;
+            abort();
         }
 
         if (access(ret, X_OK) == 0) {
@@ -96,23 +94,20 @@ pid_t pidof(char *cmd) {
     DIR *dp = NULL;
     struct dirent *de = NULL;
 
-    if (cmd == NULL) {
-        syslog(LOG_ERR, "input to pidof() is NULL");
-        return -1;
-    }
+    assert(cmd != NULL);
 
     if ((realcmd = realpath(which(cmd), cmdbuf)) == NULL) {
-        syslog(LOG_ERR, "realpath failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "realpath failure on realcmd: %s", strerror(errno));
         return -1;
     }
 
     if ((realwatch = realpath(which("vpncwatch"), watchbuf)) == NULL) {
-        syslog(LOG_ERR, "realpath failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "realpath failure on realwatch: %s", strerror(errno));
         return -1;
     }
 
-    if ((dp = opendir("/proc")) == NULL) {
-        syslog(LOG_ERR, "opendir failure: %s:%d", __func__, __LINE__);
+    if ((dp = opendir(PROCDIR)) == NULL) {
+        syslog(LOG_ERR, "opendir failure on %s: %s", PROCDIR, strerror(errno));
         return -1;
     }
 
@@ -129,9 +124,9 @@ pid_t pidof(char *cmd) {
             free(procpath);
         }
 
-        if (asprintf(&procpath, "/proc/%s/exe", de->d_name) == -1) {
+        if (asprintf(&procpath, "%s/%s/exe", PROCDIR, de->d_name) == -1) {
             syslog(LOG_ERR, "memory allocation: %s:%d", __func__, __LINE__);
-            return -1;
+            abort();
         }
 
         if ((realproc = realpath(procpath, procbuf)) == NULL) {
@@ -156,14 +151,11 @@ pid_t pidof(char *cmd) {
     }
 
     if (closedir(dp)) {
-        syslog(LOG_ERR, "closedir failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "closedir failure on %s: %s", PROCDIR, strerror(errno));
         return -1;
     }
 
-    if (procpath != NULL) {
-        free(procpath);
-    }
-
+    free(procpath);
     return ret;
 }
 
@@ -171,9 +163,9 @@ pid_t pidof(char *cmd) {
 int is_running(int pid) {
     char *pidpath = NULL;
 
-    if (asprintf(&pidpath, "/proc/%d/exe", pid) == -1) {
+    if (asprintf(&pidpath, "%s/%d/exe", PROCDIR, pid) == -1) {
         syslog(LOG_ERR, "memory allocation: %s:%d", __func__, __LINE__);
-        return 0;
+        abort();
     }
 
     if (access(pidpath, R_OK) == -1) {
@@ -193,15 +185,15 @@ pid_t start_cmd(char *cmd, char *cmdpath, char **argv) {
 
     if ((pid = fork()) == 0) {
         if (execv(cmdpath, argv) == -1) {
-            syslog(LOG_ERR, "execv failure: %s:%d", __func__, __LINE__);
+            syslog(LOG_ERR, "execv failure in %s: %s", __func__, strerror(errno));
             exit(EXIT_FAILURE);
         }
     } else if (pid == -1) {
-        syslog(LOG_ERR, "fork failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "fork failure in %s: %s", __func__, strerror(errno));
         return -1;
     } else {
         if (waitpid(pid, &status, 0) == -1) {
-            syslog(LOG_ERR, "waitpid failure: %s:%d", __func__, __LINE__);
+            syslog(LOG_ERR, "waitpid failure in %s: %s", __func__, strerror(errno));
             return -1;
         }
 
@@ -254,7 +246,7 @@ void stop_cmd(char *cmd, int cmdpid) {
     }
 
     if (is_running(cmdpid)) {
-        syslog(LOG_ERR, "%s (%d) didn't die!", cmd, cmdpid);
+        syslog(LOG_ERR, "%s (%d) did not die!", cmd, cmdpid);
     }
 
     return;

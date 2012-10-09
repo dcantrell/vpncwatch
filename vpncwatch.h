@@ -24,6 +24,9 @@
 #define VER_MAJOR 1
 #define VER_MINOR 8
 
+/* Macros */
+#define PROCDIR "/proc"
+
 /* Prototypes */
 void show_version(char *);
 void show_usage(char *);

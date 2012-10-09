@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
 
     /* find the vpnc command */
     if ((cmdpath = realpath(which(cmd), cmdbuf)) == NULL) {
-        syslog(LOG_ERR, "realpath failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "realpath failure in %s: %s", __func__, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -202,18 +202,18 @@ int main(int argc, char **argv) {
 
     /* run in the background */
     if (daemon(0, 0) == -1) {
-        syslog(LOG_ERR, "daemon failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "daemon failure: %s", strerror(errno));
         return EXIT_FAILURE;
     }
 
     /* install our signal handler */
     if (signal(SIGHUP, signal_handler) == SIG_ERR) {
-        syslog(LOG_ERR, "signal failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "signal failure (%d): %s", __LINE__, strerror(errno));
         return EXIT_FAILURE;
     }
 
     if (signal(SIGTERM, signal_handler) == SIG_ERR) {
-        syslog(LOG_ERR, "signal failure: %s:%d", __func__, __LINE__);
+        syslog(LOG_ERR, "signal failure (%d): %s", __LINE__, strerror(errno));
         return EXIT_FAILURE;
     }
 
