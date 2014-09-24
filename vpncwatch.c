@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <syslog.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -95,8 +96,9 @@ int main(int argc, char **argv) {
     char cmdbuf[PATH_MAX];
     pid_t cmdpid = 0;
     char *chkhost = NULL;
-    unsigned short chkport = 0;
+    char *chkport = NULL;
     unsigned int chkinterval = 3600;
+    struct timeval tv;
 
     /* handle options */
     if (argc < 2) {
@@ -111,26 +113,7 @@ int main(int argc, char **argv) {
                 break;
             case 'p':
                 errno = 0;
-                chkport = strtol(optarg, NULL, 10);
-
-                if (((chkport == LONG_MIN || chkport == LONG_MAX) &&
-                     (errno == ERANGE)) ||
-                    ((chkport == 0) && (errno == EINVAL))) {
-                    fprintf(stderr, "%s (%d): %s", __func__, __LINE__,
-                            strerror(errno));
-                    fflush(stderr);
-                    show_usage(argv[0]);
-                    return EXIT_FAILURE;
-                }
-
-                if ((chkport <= 0) || (chkport >= 65536)) {
-                    fprintf(stderr, "Error: Invalid port specified: %d\n",
-                            chkport);
-                    fflush(stderr);
-                    show_usage(argv[0]);
-                    return EXIT_FAILURE;
-                }
-
+                chkport = strdup(optarg);
                 break;
             case 'i':
                 errno = 0;
@@ -175,7 +158,7 @@ int main(int argc, char **argv) {
     }
 
     /* want argv to point at the vpnc args from here on */
-    argv += optind + 1;
+    argv += optind;
 
     /* find the vpnc command */
     if ((cmdpath = realpath(which(cmd), cmdbuf)) == NULL) {
@@ -225,29 +208,30 @@ int main(int argc, char **argv) {
     /* main running loop */
     do_exit = 0;
     while (!do_exit) {
+        gettimeofday(&tv,NULL);
         do_restart = 0;
         sleep(1);
         running = is_running(cmdpid);
 
-        /* see if vpnc is running */
         if (!running) {
-            syslog(LOG_WARNING, "%s died", cmd);
-        } else if (do_exit || do_restart) {
-            stop_cmd(cmd, cmdpid);
+            syslog(LOG_WARNING, "%s died, restarting", cmd);
+            cmdpid = start_cmd(cmd, cmdpath, argv);
         }
 
         /* assuming it's running, check the actual network link */
-        if (running && chkhost != NULL && chkport > 0) {
-            if (!is_network_up(chkhost, chkport)) {
+        if (running && chkhost != NULL && chkport != NULL) {
+            if (tv.tv_sec % chkinterval == 0 && !is_network_up(chkhost, chkport)) {
                 do_restart = 1;
             }
         }
 
-        if (do_restart || !running) {
+        if (do_restart) {
+            stop_cmd(cmd, cmdpid);
             cmdpid = start_cmd(cmd, cmdpath, argv);
         }
     }
 
+    stop_cmd(cmd, cmdpid);
     syslog(LOG_INFO, "exiting");
     return EXIT_SUCCESS;
 }
