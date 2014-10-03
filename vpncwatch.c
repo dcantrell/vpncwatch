@@ -175,7 +175,7 @@ int main(int argc, char **argv) {
     }
 
     /* want argv to point at the vpnc args from here on */
-    argv += optind + 1;
+    argv += optind;
 
     /* find the vpnc command */
     if ((cmdpath = realpath(which(cmd), cmdbuf)) == NULL) {
