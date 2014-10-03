@@ -36,4 +36,4 @@ int is_running(int);
 void signal_handler(int);
 pid_t start_cmd(char *, char *, char **);
 void stop_cmd(char *, int);
-int is_network_up(char *, unsigned short);
+int is_network_up(char *, char *);

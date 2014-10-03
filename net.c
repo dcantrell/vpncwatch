@@ -31,42 +31,45 @@
 
 #include "vpncwatch.h"
 
-int is_network_up(char *chkhost, unsigned short chkport) {
-    int sock;
-    struct sockaddr_in chksock;
-    struct hostent *host = NULL;
+int is_network_up(char *chkhost, char *chkport) {
+    int sfd, s;
+    struct addrinfo *result, *rp;
+    struct addrinfo hints;
 
     /* don't do a network check if the user didn't specify a host */
-    if (chkhost == NULL || chkport == 0) {
+    if (chkhost == NULL || chkport == NULL) {
         return 1;
     }
 
-    if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
-        syslog(LOG_ERR, "socket() creation error: %s", strerror(errno));
-        return 0;
-    }
-
-    memset(&chksock, 0, sizeof(chksock));
-    chksock.sin_family = AF_INET;
-    chksock.sin_port = htons(chkport);
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
+    hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
+    hints.ai_flags = 0;
+    hints.ai_protocol = IPPROTO_TCP;
 
     /* get the server address */
-    if (inet_pton(AF_INET, chkhost, &(chksock.sin_addr.s_addr)) <= 0) {
-        if ((host = gethostbyname(chkhost)) == NULL) {
-            syslog(LOG_ERR, "%s", hstrerror(h_errno));
-            return 0;
-        }
-
-        memcpy(&(chksock.sin_addr.s_addr), &(host->h_addr_list[0]),
-               sizeof(struct in_addr));
+    if ((s = getaddrinfo(chkhost, chkport, &hints, &result)) != 0) {
+        syslog(LOG_ERR, "Error getting addr info: %s", gai_strerror(s));
     }
 
-    /* try to connect */
-    if (connect(sock, (struct sockaddr *) &chksock, sizeof(chksock)) < 0) {
-        syslog(LOG_ERR, "connect() failed: %s", strerror(errno));
+    /* try list of addresses returned by getaddrinfo */
+    for (rp = result; rp != NULL; rp = rp->ai_next) {
+        sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+
+        if (sfd == -1)
+            continue;
+
+        if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
+            break;                  /* Success */
+
+        close(sfd);
+    }
+
+    freeaddrinfo(result);           /* No longer needed */
+    if (rp == NULL) {               /* No address succeeded */
+        syslog(LOG_ERR, "Could not connect");
         return 0;
     }
 
-    close(sock);
     return 1;
 }

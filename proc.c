@@ -227,7 +227,7 @@ void stop_cmd(char *cmd, int cmdpid) {
     syslog(LOG_NOTICE, "stopping %s", cmd);
 
     /* try SIGTERM, then SIGKILL */
-    for (s = SIGTERM; s <= SIGKILL; s -= (SIGTERM - SIGKILL)) {
+    for (s = SIGTERM; s >= SIGKILL; s -= (SIGTERM - SIGKILL)) {
         if (!kill(cmdpid, s)) {
             return;
         }
