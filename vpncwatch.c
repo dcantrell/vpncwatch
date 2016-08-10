@@ -57,7 +57,7 @@ void show_usage(char *prog) {
     }
 
     show_version(prog);
-    printf("Usage: %s [options] <vpnc executable> <vpnc args>\n\n", prog);
+    printf("Usage: %s [options] [--] <vpnc executable> <vpnc args>\n\n", prog);
     printf("Options:\n");
     printf("    -c HOST    Hostname or IP address on the VPN to check ");
     printf("periodically for\n");
@@ -70,11 +70,13 @@ void show_usage(char *prog) {
     printf("    -V         Show version.\n\n");
     printf("Examples:\n");
     printf("    %s vpnc /etc/vpnc/vpnc.conf\n", prog);
-    printf("    %s /usr/etc/vpnc --gateway 1.2.3.4 --id ID\n", prog);
+    printf("    %s -- /usr/etc/vpnc --gateway 1.2.3.4 --id ID\n", prog);
     printf("    %s -c intranet.corp.redhat.com -p 80 vpnc /etc/vpnc/vpnc.conf\n\n", prog);
     printf("See the man page for vpnc(8) for more information.  Please note that\n");
     printf("the vpnc executable and vpnc argument list need be at the end of the\n");
     printf("%s command line.\n", prog);
+    printf("Use -- before the vpnc executable to separate its arguments from the\n");
+    printf("arguments to %s.\n", prog);
     return;
 }
 
